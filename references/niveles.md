@@ -11,6 +11,9 @@ Mismo proyecto, distinta cantidad de movimiento. La persona elige; si duda, reco
 Se pueden mezclar ideas: para un producto estrella, nivel 3 en el gancho y el cierre y nivel 2 en el medio se logra
 partiendo el video en dos proyectos o pidiendo ajustes puntuales.
 
+## Transiciones por nivel
+Nivel 1: corte seco. Nivel 2: transiciones variadas de color y de cámara suaves. Nivel 3: el grupo completo (whip, glitch, giro, destello, logo…). Siempre se pueden pedir otras (`transiciones.md`).
+
 ## Qué NO cambia de nivel
 Logo semitransparente, zonas seguras, reglas de oferta sin precio, volumen final, picos controlados.
 

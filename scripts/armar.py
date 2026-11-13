@@ -31,6 +31,21 @@ LOGO_Y = {"tiktok": 0.10, "meta": 0.13, "reels": 0.13, "stories": 0.13, "feed": 
 # Meta (Facebook/Instagram) en Reels y Stories tapa ~14 % arriba y ~35 % abajo con su interfaz: el contenido va en el centro
 PLATAFORMAS_META = {"meta", "reels", "stories"}
 CATEGORIAS_SENSIBLES = {"salud", "belleza", "piel", "peso", "cosmetica", "cosméticos", "suplementos", "cuerpo", "estetica", "estética"}
+# Catálogo de transiciones (nombre -> descripción corta). Detalle en references/transiciones.md
+TRANSICIONES = {
+    "corte": "corte seco", "cortina": "cortina de color horizontal", "cortina_vertical": "cortina de color vertical",
+    "cortina_logo": "cortina de color con el logo de la tienda", "flash": "destello blanco", "dip": "fundido a color de marca",
+    "zoom": "zoom de golpe (punch)", "giro": "giro con zoom", "whip": "latigazo de cámara con desenfoque",
+    "empuje": "empuje lateral", "tembleque": "sacudida de cámara", "glitch": "glitch digital", "iris": "iris circular",
+    "persianas": "persianas verticales", "destello": "fuga de luz cálida", "desenfoque": "desenfoque que revela",
+}
+POOLS_TRANSICION = {
+    "variadas": ["cortina", "empuje", "zoom", "flash", "iris", "persianas", "dip", "cortina_vertical"],
+    "variadas3": ["whip", "zoom", "flash", "giro", "cortina_logo", "glitch", "destello", "iris", "persianas", "desenfoque", "empuje", "tembleque"],
+    "suaves": ["dip", "cortina", "empuje", "desenfoque", "iris", "destello"],
+    "energicas": ["whip", "zoom", "flash", "glitch", "tembleque", "giro", "persianas"],
+    "marca": ["cortina_logo", "cortina", "iris", "persianas", "destello"],
+}
 MOVIMIENTO = {"energico": ("back.out(1.7)", 0.45), "suave": ("power2.out", 0.6), "cinematico": ("expo.out", 0.8)}
 
 ICONOS = {  # trazos propios, viewBox 24, solo línea
@@ -117,6 +132,9 @@ class Montaje:
         self.iconos = marca.get("iconos", spec.get("iconos", "emoji"))
         self.html, self.tl, self.sfx, self.usados, self.audios = [], [], [], [], []
         self.factor_sfx = 1.0
+        self.html_top = []        # capas que NO se mueven con la cámara (transiciones, marca de agua)
+        self.ultima_trans = None
+        self.usa_filtro = False
         self.uid = 0
         self.rnd = random.Random(7)
 
@@ -522,7 +540,7 @@ class Montaje:
         y = self.H * LOGO_Y.get(self.spec.get("plataforma", "tiktok"), 0.10) if self.vertical else self.H * 0.05
         alto = self.H * (0.055 if self.vertical else 0.09)
         pos = "left:%.1fpx" % self.X if lado == "izquierda" else "right:%.1fpx" % (self.W - self.SAFE_R if self.vertical else self.X)
-        self.html.append('<img id="marca" class="marca" src="media/%s" style="%s;top:%.1fpx;height:%.1fpx;max-width:%.1fpx">'
+        self.html_top.append('<img id="marca" class="marca" src="media/%s" style="%s;top:%.1fpx;height:%.1fpx;max-width:%.1fpx">'
                          % (logo, pos, y, alto, self.W * 0.3))
         self.fromto("#marca", 0.3, {"opacity": 0}, {"opacity": op}, 0.5, "power1.out")
         self.to("#marca", max(fin - 0.2, 0.5), {"opacity": 0}, 0.2, "power1.in")
@@ -558,24 +576,131 @@ class Montaje:
         self.logo_marca(cta_ini)
         for i, (e, (t0, d)) in enumerate(zip(escenas, inicios)):
             self.escena(i, e, t0, d)
-            if i > 0 and e.get("transicion", True):   # "transicion": false = corte seco (p. ej. para saltar una pausa dentro del mismo clip)
-                self.transicion(t0)
+            if i > 0:   # "transicion": false o "corte" = corte seco; un nombre del catálogo; o automática variada
+                self.transicion(t0, self.elegir_transicion(i, escenas[i - 1], e))
         for s in self.spec.get("subtitulos", []):
             sel = self.texto("sb", self.acento(s["texto"]), "sub cap", self.X, self.Y_CAP, self.AW)
             self.aparece(sel, float(s["desde"]), float(s["hasta"]), {"opacity": 0, "y": 20})
         return escenas
 
-    def transicion(self, t):
+    def elegir_transicion(self, i, previa, e):
+        """Transición que entra en la escena e (la i-ésima): la pedida en la escena, o una automática variada."""
+        pedido = e.get("transicion", "auto")
+        if pedido is False:
+            return "corte"
+        if pedido not in (None, "auto"):
+            if pedido not in TRANSICIONES:
+                fallo("transición '%s' no existe. Usa: %s" % (pedido, ", ".join(TRANSICIONES)))
+            return pedido
         if self.nivel < 2:
-            return
+            return "corte"
+        if previa.get("tipo") == "habla" and e.get("tipo") == "habla" and previa.get("clip") == e.get("clip"):
+            return "corte"   # salto de una frase a la otra de la misma persona: corte seco (jump cut)
+        cfg = self.spec.get("transiciones", {})
+        if isinstance(cfg, list):
+            pool = [x for x in cfg if x in TRANSICIONES] or POOLS_TRANSICION["variadas"]
+        else:
+            estilo = cfg.get("estilo", "variadas")
+            if estilo == "variadas" and self.nivel >= 3:
+                estilo = "variadas3"
+            pool = POOLS_TRANSICION.get(estilo, POOLS_TRANSICION["variadas"])
+        tipo = pool[(i * 3) % len(pool)]
+        if tipo == self.ultima_trans:
+            tipo = pool[(i * 3 + 1) % len(pool)]
+        return tipo
+
+    def cubrir(self, estilo="", color=None, clase="cortina"):
         cid = self.nid("ct")
-        self.html.append('<div id="%s" class="cortina"></div>' % cid)
-        self.set("#" + cid, 0, {"xPercent": -101})
-        self.fromto("#" + cid, t - 0.22, {"xPercent": -101}, {"xPercent": 0}, 0.22, "power3.in")
-        self.to("#" + cid, t, {"xPercent": 101}, 0.28, "power3.out")
-        self.sonido(t - 0.22, "whoosh", 0.3, 2)
-        if self.nivel >= 3:
-            self.sonido(t, "impacto", 0.3, 3)
+        self.html_top.append('<div id="%s" class="%s" style="background:%s;%s"></div>' % (cid, clase, color or self.C["acento"], estilo))
+        return "#" + cid
+
+    def transicion(self, t, tipo):
+        """Dibuja la transición `tipo` alrededor del corte en el segundo t (las escenas se cortan en t; esto lo disimula)."""
+        if tipo == "corte":
+            return
+        self.ultima_trans = tipo
+        W, H = self.W, self.H
+        rnd = random.Random(int(t * 100))
+        if tipo in ("cortina", "cortina_logo", "cortina_vertical"):
+            sel = self.cubrir()
+            eje = "yPercent" if tipo == "cortina_vertical" else "xPercent"
+            self.set(sel, 0, {eje: -101})
+            self.fromto(sel, t - 0.22, {eje: -101}, {eje: 0}, 0.22, "power3.in")
+            self.to(sel, t, {eje: 101}, 0.28, "power3.out")
+            if tipo == "cortina_logo" and self.spec.get("_logo_archivo"):
+                li = self.nid("lt")
+                w = W * 0.42
+                self.html_top.append('<img id="%s" class="logo-trans" src="media/%s" style="left:%.1fpx;top:%.1fpx;width:%.1fpx">'
+                                     % (li, self.spec["_logo_archivo"], (W - w) / 2, H * 0.43, w))
+                self.fromto("#" + li, t - 0.15, {"opacity": 0, "scale": 0.7}, {"opacity": 1, "scale": 1}, 0.18, "back.out(1.7)")
+                self.to("#" + li, t + 0.05, {"opacity": 0}, 0.15, "power1.in")
+            self.sonido(t - 0.22, "whoosh", 0.3, 2)
+        elif tipo in ("flash", "dip"):
+            sel = self.cubrir("opacity:0", "#FFFFFF" if tipo == "flash" else self.C["fondo"])
+            ent, sal = (0.07, 0.22) if tipo == "flash" else (0.2, 0.28)
+            self.fromto(sel, t - ent, {"opacity": 0}, {"opacity": 1}, ent, "power2.in")
+            self.to(sel, t, {"opacity": 0}, sal, "power2.out")
+            self.sonido(t - 0.05, "brillo" if tipo == "flash" else "whoosh", 0.25, 2)
+        elif tipo == "iris":
+            ini, fin = "circle(0%% at 50%% 50%%)", "circle(75%% at 50%% 50%%)"
+            sel = self.cubrir("clip-path:%s" % (ini % ()))
+            self.set(sel, 0, {"clipPath": ini % ()})
+            self.fromto(sel, t - 0.24, {"clipPath": ini % ()}, {"clipPath": fin % ()}, 0.24, "power2.in")
+            self.to(sel, t, {"clipPath": ini % ()}, 0.32, "power2.out")
+            self.sonido(t - 0.24, "whoosh", 0.3, 2)
+        elif tipo == "persianas":
+            n = 6
+            ancho = W / float(n)
+            for k in range(n):
+                cid = self.nid("pv")
+                self.html_top.append('<div id="%s" class="cortina" style="left:%.1fpx;width:%.1fpx;transform-origin:0%% 50%%"></div>' % (cid, k * ancho, ancho + 1))
+                sel = "#" + cid
+                self.set(sel, 0, {"scaleX": 0})
+                self.fromto(sel, t - 0.2 + k * 0.025, {"scaleX": 0}, {"scaleX": 1}, 0.14, "power2.out")
+                self.set(sel, t - 0.005 + k * 0.0001, {"transformOrigin": "100% 50%"})
+                self.to(sel, t + k * 0.025, {"scaleX": 0}, 0.16, "power2.in")
+            self.sonido(t - 0.2, "whoosh", 0.3, 2)
+        elif tipo == "destello":
+            sel = self.cubrir("opacity:0;mix-blend-mode:screen;background:radial-gradient(circle at 28% 34%, rgba(255,226,170,.98) 0%, rgba(255,128,48,.70) 34%, rgba(255,60,0,0) 72%)", "transparent")
+            self.fromto(sel, t - 0.16, {"opacity": 0}, {"opacity": 1}, 0.16, "power2.in")
+            self.to(sel, t, {"opacity": 0}, 0.4, "power2.out")
+            self.sonido(t - 0.1, "brillo", 0.3, 2)
+        elif tipo in ("zoom", "giro", "whip", "empuje", "desenfoque"):
+            antes, despues, ent, sal = {
+                "zoom": ({"scale": 1.4}, {"scale": 1.4}, 0.16, 0.34),
+                "giro": ({"rotation": -7, "scale": 1.3}, {"rotation": 7, "scale": 1.3}, 0.16, 0.36),
+                "whip": ({"x": -170, "scale": 1.28, "skewX": -10, "filter": "blur(14px)"}, {"x": 170, "scale": 1.28, "skewX": 10, "filter": "blur(14px)"}, 0.16, 0.30),
+                "empuje": ({"x": -130, "scale": 1.14}, {"x": 130, "scale": 1.14}, 0.2, 0.32),
+                "desenfoque": ({"filter": "blur(22px)", "scale": 1.08}, {"filter": "blur(22px)", "scale": 1.08}, 0.2, 0.32),
+            }[tipo]
+            if "filter" in antes:
+                self.usa_filtro = True
+            self.to("#stage", t - ent, dict(antes), ent, "power2.in")
+            self.set("#stage", t, dict(despues))
+            reposo = {"scale": 1, "x": 0, "rotation": 0, "skewX": 0}
+            if "filter" in antes:
+                reposo["filter"] = "blur(0px)"
+            self.to("#stage", t, reposo, sal, "power3.out")
+            self.sonido(t - ent, "whoosh", 0.3, 2)
+            if tipo in ("zoom", "giro") and self.nivel >= 3:
+                self.sonido(t, "impacto", 0.25, 3)
+        elif tipo in ("tembleque", "glitch"):
+            fuerte = tipo == "glitch"
+            amp, pasos, dt = (34, 8, 0.03) if fuerte else (18, 6, 0.04)
+            t_ini = t - pasos * dt / 2.0
+            for k in range(pasos):
+                self.set("#stage", t_ini + k * dt, {"x": round(rnd.uniform(-amp, amp), 1), "y": round(rnd.uniform(-amp * 0.6, amp * 0.6), 1),
+                                                     "rotation": round(rnd.uniform(-1.4, 1.4), 2), "scale": 1.09})
+            self.set("#stage", t_ini + pasos * dt, {"x": 0, "y": 0, "rotation": 0, "scale": 1})
+            if fuerte:
+                for k in range(4):
+                    sel = self.cubrir("opacity:0;top:%.1fpx;height:%.1fpx;bottom:auto" % (rnd.uniform(0.15, 0.85) * H, rnd.uniform(14, 46)),
+                                      self.C["acento"] if k % 2 == 0 else self.C["apoyo"])
+                    self.set(sel, t_ini + k * dt, {"opacity": 0.9})
+                    self.set(sel, t_ini + k * dt + 0.05, {"opacity": 0})
+            self.sonido(t_ini, "click", 0.3, 2)
+            if fuerte and self.nivel >= 3:
+                self.sonido(t, "impacto", 0.25, 3)
 
     # ---- salida -----------------------------------------------------------------
     def css(self):
@@ -614,6 +739,8 @@ html,body{width:%(W)dpx;height:%(H)dpx;overflow:hidden;background:%(fondo)s}
 .logo-grande{position:absolute;opacity:0;z-index:6;height:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
 .marca{position:absolute;opacity:0;z-index:12;width:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
 .cortina{position:absolute;inset:0;z-index:20;background:%(acento)s}
+#stage{position:absolute;inset:0;transform-origin:50%% 50%%}
+.logo-trans{position:absolute;opacity:0;z-index:21;height:auto}
 .parts{position:absolute;opacity:0;z-index:8}.parts i{position:absolute;border-radius:50%%;display:block}""" % {
             "W": self.W, "H": self.H, "fondo": C["fondo"], "acento": C["acento"], "texto": C["texto"],
             "ft": F["texto"], "wt": F.get("pesoTexto", 700), "fh": F["titulos"], "wh": F.get("pesoTitulos", 800),
@@ -643,14 +770,17 @@ html,body{width:%(W)dpx;height:%(H)dpx;overflow:hidden;background:%(fondo)s}
 <link href="%(fuentes)s" rel="stylesheet"><script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <style>%(css)s</style></head><body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="%(T).3f" data-width="%(W)d" data-height="%(H)d">
+<div id="stage">
 %(cuerpo)s
 <div class="sombra"></div>
+</div>
+%(top)s
 %(audio)s
 <script>window.__timelines=window.__timelines||{};const tl=gsap.timeline({paused:true});
-%(tl)s
+%(inicio)s%(tl)s
 window.__timelines["main"]=tl;</script></div></body></html>""" % {
             "W": self.W, "H": self.H, "fuentes": fuentes, "css": self.css(), "T": self.total,
-            "cuerpo": "\n".join(self.html), "audio": "\n".join(audio), "tl": "\n".join(self.tl)}
+            "cuerpo": "\n".join(self.html), "top": "\n".join(self.html_top), "inicio": ("tl.set(\"#stage\",{filter:\"blur(0px)\"},0);\n" if self.usa_filtro else ""), "audio": "\n".join(audio), "tl": "\n".join(self.tl)}
 
 
 def npx(args, cwd):

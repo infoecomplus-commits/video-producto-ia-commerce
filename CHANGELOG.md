@@ -1,5 +1,10 @@
 # Cambios
 
+## 0.5.0
+- 15 transiciones (cortina horizontal y vertical, con logo, flash, fundido a color, zoom, giro, whip, empuje, tembleque, glitch, iris, persianas,
+  destello, desenfoque) más el corte seco, con elección automática variada y salto seco entre frases de la misma persona.
+- `references/transiciones.md`: catálogo, criterio y tendencias anotadas con fuentes (13/11/2026).
+
 ## 0.4.0
 - Paso de análisis: `resumen.py` y `references/analisis.md`. El skill lee el material (escenas sueltas o un video largo en crudo) y cuenta
   la estructura que ya ve y la que puede crear antes de editar; la plantilla de seis escenas pasa a ser solo un punto de partida.

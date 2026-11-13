@@ -2,7 +2,7 @@
 name: video-producto-ia-commerce
 description: Crea videos cortos de PRODUCTO para tiendas de e-commerce (anuncios para Meta y TikTok, reels, historias) a partir de los clips del producto (con o sin una creadora de contenido hablando) - gancho, producto, demostración, beneficios, oferta SIN precio y llamado a comprar - con el logo de la tienda en transparencia arriba. Entrevista la marca, guarda un perfil por tienda, monta con HyperFrames en 3 niveles (básico, movimiento, profesional) y entrega con volumen parejo, picos controlados y una versión corta para historia. Úsalo cuando pidan "video de producto", "video para mi tienda", "anuncio en video de este producto", "reel del producto", "video con el logo de mi tienda", "historia de TikTok del producto" o entreguen clips de un producto. NO es para editar vlogs o videos hablados personales sin un producto, ni para escribir guiones de actores, ni para imágenes estáticas.
 metadata:
-  version: 0.4.0
+  version: 0.5.0
   autor: IA Commerce
 ---
 
@@ -104,6 +104,7 @@ python3 scripts/nuevo_proyecto.py <proyecto> --tienda "Nombre" --formato 9:16 --
 # edita <proyecto>/proyecto.json con las escenas (ver references/escenas.md)
 python3 scripts/armar.py <proyecto> --cuadros 1.5,5,9,14      # arma y captura cuadros en revision/
 ```
+Transiciones: hay 15 más el corte seco y se eligen variadas solas (nunca la misma dos veces seguidas); se piden por escena o por estilo (`references/transiciones.md`).
 Mira los cuadros con `references/revision.md` (texto legible, nada tapando el producto, logo bien puesto), corrige y
 repite. Nivel 1/2/3: `references/niveles.md`. El nivel lo elige la persona; avisa que el 3 gasta más tiempo.
 

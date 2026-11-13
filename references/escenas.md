@@ -23,6 +23,7 @@ demostración → cierre (sin beneficios ni oferta, porque ella no los dijo).
 ## Campos comunes
 - `tipo`: uno de los de arriba. `clip`: nombre del archivo en `media/` (lo dejó `preparar.py`).
 - `desde`: segundo del clip donde empieza. `dur`: segundos que dura la escena.
+- `transicion`: la transición que ENTRA en esa escena (`"whip"`, `"zoom"`, `"corte"`, `false`…) o `"auto"`. Catálogo en `transiciones.md`.
 - `historia`: `false` para omitir la escena en la versión corta. `dur_historia`: duración en la versión corta.
 - `etiqueta`: texto suelto extra (opcional) en cualquier escena; `etiqueta_t`: `[desde, hasta]` en segundos del clip
   para que aparezca solo en ese momento.
@@ -70,6 +71,7 @@ con transparencia. Funciona mejor con planos a cámara con fondo limpio y textos
 - `musica`: `{"archivo": "ruta", "volumen": 0.12}` solo si tiene derechos de uso. `voz`: `{"archivo": "ruta"}`.
 - `subtitulos`: lista opcional `{"texto": "...", "desde": 2.0, "hasta": 4.5}` en segundos del video final.
 - `sonidos`: `false` para quitar los efectos.
+- `transiciones`: `{"estilo": "variadas|suaves|energicas|marca"}` o una lista de nombres para recorrer.
 
 ## Cómo escribir los textos (por categoría)
 - **Hogar, herramientas, tecnología**: muestra el problema resuelto en una acción. Beneficio = lo que se ve, no un adjetivo.
