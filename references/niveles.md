@@ -6,7 +6,7 @@ Mismo proyecto, distinta cantidad de movimiento. La persona elige; si duda, reco
 |---|---|---|---|
 | **1 · Básico** | Cortes limpios, textos y chips que entran y salen, logo, cierre con botón, pocos efectos de sonido | Volumen: muchos productos, pruebas de anuncio | Bajo |
 | **2 · Movimiento** | Todo el 1 + movimiento lento de cámara en cada clip, cortinas de color entre escenas, íconos que rebotan, botón que late, antes/después con barrido (si se permite) | El estándar para anuncios y reels | Medio |
-| **3 · Profesional** | Todo el 2 + entradas con más impacto, partículas en oferta y cierre, color más vivo en los clips, efectos de sonido en cada transición | Lanzamientos y productos estrella | Alto: tarda más en renderizar |
+| **3 · Profesional** | Todo el 2 + entradas con más impacto, partículas en oferta y cierre, color más vivo en los clips, efectos de sonido en cada transición. Opción: texto gigante detrás de la persona (ver `escenas.md`) | Lanzamientos y productos estrella | Alto: tarda más en renderizar |
 
 Se pueden mezclar ideas: para un producto estrella, nivel 3 en el gancho y el cierre y nivel 2 en el medio se logra
 partiendo el video en dos proyectos o pidiendo ajustes puntuales.

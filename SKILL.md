@@ -2,7 +2,7 @@
 name: video-producto-ia-commerce
 description: Crea videos cortos de PRODUCTO para tiendas de e-commerce (anuncios para Meta y TikTok, reels, historias) a partir de los clips del producto (con o sin una creadora de contenido hablando) - gancho, producto, demostración, beneficios, oferta SIN precio y llamado a comprar - con el logo de la tienda en transparencia arriba. Entrevista la marca, guarda un perfil por tienda, monta con HyperFrames en 3 niveles (básico, movimiento, profesional) y entrega con volumen parejo, picos controlados y una versión corta para historia. Úsalo cuando pidan "video de producto", "video para mi tienda", "anuncio en video de este producto", "reel del producto", "video con el logo de mi tienda", "historia de TikTok del producto" o entreguen clips de un producto. NO es para editar vlogs o videos hablados personales sin un producto, ni para escribir guiones de actores, ni para imágenes estáticas.
 metadata:
-  version: 0.2.0
+  version: 0.3.0
   autor: IA Commerce
 ---
 
@@ -76,6 +76,11 @@ Arma el guion con `references/escenas.md`: gancho → producto → demostración
 (+ antes/después solo si la categoría y la política lo permiten). Muéstraselo corto, escena por escena, con el clip
 que usarás en cada una, y espera su visto bueno. Ofrécele siempre una **versión corta para historia**.
 Si los clips no tienen voz, el tiempo lo manda el plan; si la tienen, lo mandan las frases elegidas.
+
+### Texto detrás de la persona (opcional, nivel 3)
+Para una palabra clave gigante detrás de la creadora: `python3 scripts/recortar.py <proyecto> <clip> --desde S --hasta S`
+y el campo `detras` de la escena (ver `references/escenas.md`). El color se elige solo según el fondo; revisa los
+cuadros por si el recorte falla con pelo, manos o el producto.
 
 ### Música de fondo
 Pregunta si quiere música. Una cama de energía bajo la voz suele mejorar mucho un anuncio. Dos caminos:

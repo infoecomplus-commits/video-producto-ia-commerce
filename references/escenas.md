@@ -44,6 +44,20 @@ y se usan íconos de trazo en el color de acento; con `"iconos": "ninguno"` no s
 Ojo: el emoji se dibuja con la tipografía de emojis del equipo donde se renderiza (Apple en Mac, Segoe en Windows,
 Noto Color Emoji en Linux), así que su aspecto cambia un poco de un equipo a otro.
 
+## Texto gigante DETRÁS de la persona (opción de nivel 3)
+La palabra clave grande queda detrás de la persona: el fondo del clip, el texto y encima un recorte de la persona
+con transparencia. Funciona mejor con planos a cámara con fondo limpio y textos cortos (1 o 2 palabras).
+1. Recorta a la persona: `python3 scripts/recortar.py <proyecto> <clip.mp4> [--desde 12 --hasta 18]` (usa
+   `hyperframes remove-background`; la primera vez descarga un modelo y tarda unos minutos; con --desde/--hasta es mucho más rápido).
+2. En la escena (tipo `habla` u otro con clip) agrega `detras`:
+   `"detras": [{"texto": "SIN\nLUGAR", "de": 15.5, "a": 17.4, "y": 0.22, "tam": 0.25}]`
+   (`de`/`a` en segundos del CLIP; `y` = altura como fracción del alto; `tam` = tamaño como fracción del lado corto).
+3. **El color se elige solo** para que contraste con el fondo (mínimo 3:1): prueba el color de acento de la marca, luego
+   blanco y luego oscuro. Si pides un `color` que casi no se lee sobre ese fondo, el motor avisa y usa otro. No
+   pongas un texto del mismo tono que la pared o el fondo: se pierde.
+4. Revisa siempre los cuadros: el modelo puede fallar con pelo suelto, manos rápidas o el producto que la persona sostiene
+   (lo trata como fondo). Si falla, quita el efecto en esa escena.
+
 ## Nivel, marca y audio a nivel de proyecto
 - `nivel`: 1, 2 o 3. `plataforma`: `meta` (Facebook e Instagram), `tiktok`, `reels`, `stories` o `feed`.
 - `logo`: `{"archivo": "logo.png", "lado": "auto|izquierda|derecha", "opacidad": 0.7}`. `auto` usa el lado

@@ -1,5 +1,9 @@
 # Cambios
 
+## 0.3.0
+- Texto gigante detrás de la persona (`recortar.py` + campo `detras`) con recorte de IA local (HyperFrames).
+  El color se elige solo para que contraste con el fondo y se avisa si el color pedido casi no se lee.
+
 ## 0.2.0
 - Clips con una persona hablando: el audio original se guarda aparte, escenas `habla` con subtítulos automáticos,
   `habla.py` (mapa de voz con texto y segundos, y ritmo de habla para decidir la velocidad), `tira.py` (tiras de cuadros).

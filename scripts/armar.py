@@ -51,6 +51,18 @@ EMOJIS = {"check": "✅", "star": "⭐", "truck": "🚚", "shield": "🛡️", "
           "clock": "⏰", "sparkle": "✨", "gift": "🎁"}
 
 
+def luminancia_relativa(hexcolor):
+    h = hexcolor.lstrip("#")
+    r, g, b = [int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4)]
+    lin = lambda c: c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+
+
+def contraste(l1, l2):
+    a, b = max(l1, l2), min(l1, l2)
+    return (a + 0.05) / (b + 0.05)
+
+
 def hex_a_rgba(h, a):
     h = h.lstrip("#")
     return "rgba(%d,%d,%d,%s)" % (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), a)
@@ -220,6 +232,8 @@ class Montaje:
         elif tipo != "comparativo":
             sel, d2 = self.clip(e["clip"], float(e.get("desde", 0)), t0, d)
             self.movimiento_camara(sel, t0, d2)
+            if e.get("detras"):
+                self.texto_detras(e, t0, d2)
         hay_voz = bool(self.spec.get("voz", {}).get("archivo"))
         x, ancho = self.X, self.AW
 
@@ -351,6 +365,77 @@ class Montaje:
             s = self.texto("tx", "<span>%s</span>" % self.acento(e["etiqueta"]), "chip", x, self.Y_CAP - self.m * 0.12, None, "max-width:%.1fpx" % ancho)
             self.aparece(s, a0, a1)
             self.sonido(a0, "pop", 0.3)
+
+    def luminancia_fondo(self, clip, seg, y0, y1):
+        """Luminancia relativa (0-1) del fondo donde irá el texto: mide los costados de la franja (donde casi nunca está
+        la persona) en el clip, en el segundo `seg`."""
+        W = self.W
+        vals = []
+        for x0 in (0, int(W * 0.8)):
+            vf = "crop=%d:%d:%d:%d,scale=1:1,format=gray" % (int(W * 0.2), max(int(y1 - y0), 8), x0, max(int(y0), 0))
+            r = subprocess.run(["ffmpeg", "-v", "error", "-ss", "%.2f" % max(seg, 0), "-i", str(clip), "-vf", vf, "-frames:v", "1",
+                                "-f", "rawvideo", "-pix_fmt", "gray", "-"], capture_output=True)
+            if r.stdout:
+                vals.append(r.stdout[0] / 255.0)
+        if not vals:
+            return 0.5
+        g = sum(vals) / len(vals)
+        return g / 12.92 if g <= 0.03928 else ((g + 0.055) / 1.055) ** 2.4
+
+    def color_detras(self, pedido, lum_fondo):
+        """Color del texto detrás de la persona con contraste suficiente contra el fondo (texto grande: mínimo 3:1)."""
+        oscuro = "#0B0E13"
+        candidatos = []
+        if pedido and pedido != "auto":
+            candidatos.append(pedido)
+        candidatos += [self.C["acento"], "#FFFFFF", oscuro]
+        for c in candidatos:
+            if contraste(luminancia_relativa(c), lum_fondo) >= 3.0:
+                if pedido and pedido != "auto" and c != pedido:
+                    print("aviso: el color %s casi no se lee sobre ese fondo (contraste %.1f:1); uso %s" %
+                          (pedido, contraste(luminancia_relativa(pedido), lum_fondo), c))
+                return c
+        blanco, negro = contraste(luminancia_relativa("#FFFFFF"), lum_fondo), contraste(luminancia_relativa(oscuro), lum_fondo)
+        return "#FFFFFF" if blanco >= negro else oscuro
+
+    def texto_detras(self, e, t0, d):
+        """Texto grande DETRÁS de la persona: fondo (clip) -> texto -> recorte de la persona (con transparencia) encima.
+        Necesita media/<clip>_recorte.webm (recortar.py). `detras` = {"texto", "de", "a", "y", "color", "tam"} o lista de esos."""
+        stem = Path(e["clip"]).stem
+        rec = self.base / "media" / (stem + "_recorte.webm")
+        if not rec.exists():
+            fallo("'detras' necesita el recorte de la persona: python3 scripts/recortar.py <proyecto> %s" % e["clip"])
+        offset = 0.0
+        meta = self.base / "media" / (stem + "_recorte.json")
+        if meta.exists():
+            offset = float(json.load(open(meta)).get("desde", 0))
+        desde = float(e.get("desde", 0)) - offset
+        if desde < 0:
+            fallo("el recorte de %s empieza en %.2fs y la escena pide desde %.2fs; vuelve a correr recortar.py con un tramo mayor"
+                  % (e["clip"], offset, float(e.get("desde", 0))))
+        if rec.name not in self.usados:
+            self.usados.append(rec.name)
+        i = self.nid("rc")
+        self.html.append('<video id="%s" class="clip recorte" src="media/%s" muted playsinline data-start="%.3f" data-duration="%.3f" '
+                         'data-media-start="%.3f"></video>' % (i, rec.name, t0, d, desde))
+        self.movimiento_camara("#" + i, t0, d)
+        items = e["detras"] if isinstance(e["detras"], list) else [e["detras"]]
+        dsd = float(e.get("desde", 0))
+        for it in items:
+            a0 = t0 + max(float(it.get("de", dsd)) - dsd, 0.0)
+            a1 = min(t0 + float(it.get("a", dsd + d)) - dsd, t0 + d)
+            tam = int(self.m * float(it.get("tam", 0.24)))
+            lineas = it["texto"].replace("\\n", "\n").count("\n") + 1
+            y_ini = self.H * float(it.get("y", 0.30))
+            seg_clip = dsd + max(((a0 + a1) / 2.0) - t0, 0.0)
+            lum = self.luminancia_fondo(self.base / "media" / Path(e["clip"]).name, seg_clip, y_ini, y_ini + tam * 0.95 * lineas)
+            color = self.color_detras(it.get("color"), lum)
+            cuerpo = "<br>".join(html.escape(p) for p in it["texto"].replace("\\n", "\n").split("\n"))
+            sel = self.texto("dt", cuerpo, "detras", 0, self.H * float(it.get("y", 0.30)), self.W,
+                             "font-size:%dpx;color:%s;text-shadow:0 8px 30px rgba(0,0,0,.18)" % (tam, color))
+            self.fromto(sel, a0, {"opacity": 0, "scale": 1.18}, {"opacity": 1, "scale": 1}, 0.45, "power3.out")
+            self.to(sel, max(a1 - 0.2, a0 + 0.3), {"opacity": 0}, 0.2, "power1.in")
+            self.sonido(a0, "whoosh", 0.3, 2)
 
     def subtitulos_habla(self, e, t0, d):
         """`habla`: lista de {"texto", "de", "a"} con tiempos del CLIP (segundos). Se reparten en bloques de pocas palabras
@@ -501,6 +586,8 @@ class Montaje:
 html,body{width:%(W)dpx;height:%(H)dpx;overflow:hidden;background:%(fondo)s}
 #root{position:absolute;inset:0;overflow:hidden;font-family:'%(ft)s',sans-serif;color:#fff}
 .fondo{position:absolute;left:0;top:0;width:%(W)dpx;height:%(H)dpx;object-fit:cover;z-index:1;transform-origin:50%% 50%%}
+.detras{position:absolute;text-align:center;opacity:0;z-index:3;font-family:'%(fh)s',sans-serif;font-weight:%(wh)s;line-height:.95;letter-spacing:-.03em;text-transform:uppercase}
+.recorte{position:absolute;left:0;top:0;width:%(W)dpx;height:%(H)dpx;object-fit:cover;z-index:4;transform-origin:50%% 50%%}
 .cmp{position:absolute;left:0;top:0;overflow:hidden;z-index:2}
 .cmp video{object-fit:cover}
 .linea{position:absolute;left:0;top:0;width:6px;background:%(acento)s;z-index:3;opacity:0;margin-left:-3px}
