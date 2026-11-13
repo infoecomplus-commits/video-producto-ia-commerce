@@ -1,5 +1,8 @@
 # Cambios
 
+## 0.5.1
+- Instalación: el prompt incluye el diagnóstico, se explica el permiso que pide Claude Code, se evita `install.sh` y se indica abrir una sesión nueva.
+
 ## 0.5.0
 - 15 transiciones (cortina horizontal y vertical, con logo, flash, fundido a color, zoom, giro, whip, empuje, tembleque, glitch, iris, persianas,
   destello, desenfoque) más el corte seco, con elección automática variada y salto seco entre frases de la misma persona.

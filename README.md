@@ -8,7 +8,12 @@ Flujo: **gancho → producto → demostración → beneficios → oferta (sin pr
 ## Instalación
 La forma fácil: abre **Claude Code** y pégale esto:
 
-> Instala el siguiente skill https://github.com/infoecomplus-commits/video-producto-ia-commerce y hazme las preguntas para armar mi primer video de producto.
+> Instala el siguiente skill https://github.com/infoecomplus-commits/video-producto-ia-commerce, revisa mi equipo con su diagnóstico (scripts/doctor.py) y hazme las preguntas para armar mi primer video de producto.
+
+**Qué vas a ver (es normal):**
+- Claude clona el repositorio y te pide permiso para correr el diagnóstico `scripts/doctor.py`. Acéptalo: solo lee tu equipo y no cambia nada.
+- Claude Code no ejecuta por su cuenta código descargado de internet (por ejemplo `install.sh`). Si te lo dice, corre tú el diagnóstico en la terminal: `python3 ~/.claude/skills/video-producto-ia-commerce/scripts/doctor.py`.
+- **Abre una sesión nueva de Claude Code** cuando termine la instalación: los skills se cargan al iniciar la sesión.
 
 A mano:
 1. Descarga o clona este repositorio en `~/.claude/skills/video-producto-ia-commerce` (en Windows: `%USERPROFILE%\.claude\skills\`).

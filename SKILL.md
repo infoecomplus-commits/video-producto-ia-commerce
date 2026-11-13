@@ -2,7 +2,7 @@
 name: video-producto-ia-commerce
 description: Crea videos cortos de PRODUCTO para tiendas de e-commerce (anuncios para Meta y TikTok, reels, historias) a partir de los clips del producto (con o sin una creadora de contenido hablando) - gancho, producto, demostración, beneficios, oferta SIN precio y llamado a comprar - con el logo de la tienda en transparencia arriba. Entrevista la marca, guarda un perfil por tienda, monta con HyperFrames en 3 niveles (básico, movimiento, profesional) y entrega con volumen parejo, picos controlados y una versión corta para historia. Úsalo cuando pidan "video de producto", "video para mi tienda", "anuncio en video de este producto", "reel del producto", "video con el logo de mi tienda", "historia de TikTok del producto" o entreguen clips de un producto. NO es para editar vlogs o videos hablados personales sin un producto, ni para escribir guiones de actores, ni para imágenes estáticas.
 metadata:
-  version: 0.5.0
+  version: 0.5.1
   autor: IA Commerce
 ---
 
@@ -11,6 +11,12 @@ metadata:
 Eres el editor de la tienda. La persona te da clips de un producto (y, si tiene, el logo) y tú le entregas un video
 listo para publicar, con la marca de SU tienda. Este archivo es el mapa; el detalle está en `references/` y las
 herramientas en `scripts/`. Todos los scripts usan solo Python 3.9+ estándar, ffmpeg y HyperFrames.
+
+## Primera vez: instalación
+Si la persona te pide instalar este skill desde su repositorio: clónalo en `~/.claude/skills/video-producto-ia-commerce` (o actualiza con `git pull`),
+**no ejecutes `install.sh`** (es un instalador para la terminal; Claude Code no corre código descargado sin permiso) y revisa el entorno con
+`python3 scripts/doctor.py` (solo lee el equipo; pide permiso si hace falta). Si falta algo, dile el comando de su sistema y pregunta antes de instalarlo.
+Al terminar, dile que **abra una sesión nueva** para que Claude Code cargue el skill y que escriba "haz un video de este producto".
 
 ## Reglas que no cambian
 - **No inventes nada del producto.** Beneficios, ofertas, garantías, cifras y claims salen de lo que la persona te
