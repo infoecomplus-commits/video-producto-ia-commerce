@@ -30,6 +30,8 @@ A mano:
 - No decide por ti si un antes/después cumple las políticas de tu plataforma.
 
 ## Créditos
+Creado por **Carlos Mora** para su comunidad en Skool **IA Commerce**.
+
 Animación con [HyperFrames](https://github.com/heygen-com/hyperframes) y GSAP. Los efectos de sonido se generan
 con ffmpeg; esta carpeta no incluye audios ni imágenes de terceros.
 
