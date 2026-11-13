@@ -2,7 +2,7 @@
 name: video-producto-ia-commerce
 description: Crea videos cortos de PRODUCTO para tiendas de e-commerce (anuncios para Meta y TikTok, reels, historias) a partir de los clips del producto (con o sin una creadora de contenido hablando) - gancho, producto, demostración, beneficios, oferta SIN precio y llamado a comprar - con el logo de la tienda en transparencia arriba. Entrevista la marca, guarda un perfil por tienda, monta con HyperFrames en 3 niveles (básico, movimiento, profesional) y entrega con volumen parejo, picos controlados y una versión corta para historia. Úsalo cuando pidan "video de producto", "video para mi tienda", "anuncio en video de este producto", "reel del producto", "video con el logo de mi tienda", "historia de TikTok del producto" o entreguen clips de un producto. NO es para editar vlogs o videos hablados personales sin un producto, ni para escribir guiones de actores, ni para imágenes estáticas.
 metadata:
-  version: 0.3.0
+  version: 0.4.0
   autor: IA Commerce
 ---
 
@@ -71,14 +71,18 @@ python3 scripts/habla.py <proyecto>        # mapa de voz: cada tramo hablado con
 - Para mirar un tramo con calma (cuándo está lista, cuándo posa esperando): `python3 scripts/tira.py <proyecto> <clip> --desde 7 --hasta 12 --fps 5`.
 - El método completo, con los errores típicos, está en `references/creadora.md`. Léelo antes de cortar.
 
-## Paso 3 · El plan de escenas
-La estructura sale **del material de esta persona**, no de una plantilla. Mira los clips (`media/hoja_*.jpg`) y, si hay
-voz, lo que dicen (`habla.py`), y arma el orden con lo que realmente hay. `references/escenas.md` trae un punto de partida
-(gancho → producto → demostración → beneficios → oferta → llamado a comprar), pero: omite las escenas para las que no hay
-clip o dato confirmado (sin oferta confirmada, no hay escena de oferta), reordénalas según el guion que siguió la persona
-y pregunta qué falta antes de rellenar. Antes/después solo si la categoría y la política lo permiten. Muéstraselo corto, escena por escena, con el clip
-que usarás en cada una, y espera su visto bueno. Ofrécele siempre una **versión corta para historia**.
-Si los clips no tienen voz, el tiempo lo manda el plan; si la tienen, lo mandan las frases elegidas.
+## Paso 3 · Analiza y propone la estructura
+La estructura sale **del material de esta persona**, no de una plantilla. Puede subir escenas sueltas o un solo video largo
+en crudo (o una mezcla). Lee todo y cuéntale **dos cosas**: la estructura que ya ves en su material y la que puedes crear.
+Método completo en `references/analisis.md`:
+```bash
+python3 scripts/resumen.py <proyecto>      # analisis.md: clips, tramos hablados, intentos repetidos
+```
+- **Estructura que ya veo:** el orden en que se grabó, qué frases tienen varios intentos (y cuál elegirías) y qué sobra.
+- **Estructura que puedo crear:** escenas en orden con su clip y tramo; qué falta o no está confirmado (sin oferta confirmada, no hay escena de oferta).
+- `references/escenas.md` trae un punto de partida (gancho, producto, demostración, beneficios, oferta, llamado a comprar),
+  pero omite lo que no tiene clip ni dato confirmado y reordena según el guion que siguió la persona.
+- Ofrécele una **versión corta para historia**. Espera su visto bueno antes de editar. Antes/después solo si la categoría y la política lo permiten.
 
 ### Texto detrás de la persona (opcional, nivel 3)
 Para una palabra clave gigante detrás de la creadora: `python3 scripts/recortar.py <proyecto> <clip> --desde S --hasta S`

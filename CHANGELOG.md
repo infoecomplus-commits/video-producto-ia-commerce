@@ -1,5 +1,9 @@
 # Cambios
 
+## 0.4.0
+- Paso de análisis: `resumen.py` y `references/analisis.md`. El skill lee el material (escenas sueltas o un video largo en crudo) y cuenta
+  la estructura que ya ve y la que puede crear antes de editar; la plantilla de seis escenas pasa a ser solo un punto de partida.
+
 ## 0.3.0
 - Texto gigante detrás de la persona (`recortar.py` + campo `detras`) con recorte de IA local (HyperFrames).
   El color se elige solo para que contraste con el fondo y se avisa si el color pedido casi no se lee.
