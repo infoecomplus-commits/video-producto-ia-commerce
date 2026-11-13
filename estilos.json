@@ -1,0 +1,33 @@
+{
+  "_nota": "Puntos de partida de IA Commerce. Todos se pueden cambiar; si la tienda tiene colores de marca, se usan esos.",
+  "neon-urbano": {
+    "nombre": "Neón urbano",
+    "colores": {"fondo": "#0B0B14", "texto": "#FFFFFF", "acento": "#00E5FF", "apoyo": "#FF4D8D"},
+    "fuentes": {"titulos": "Syne", "pesoTitulos": 800, "texto": "Manrope", "pesoTexto": 700},
+    "movimiento": "energico"
+  },
+  "boutique": {
+    "nombre": "Boutique",
+    "colores": {"fondo": "#FAF6F0", "texto": "#1F1B16", "acento": "#B8864B", "apoyo": "#3D5A4C"},
+    "fuentes": {"titulos": "Cormorant Garamond", "pesoTitulos": 700, "texto": "Jost", "pesoTexto": 600},
+    "movimiento": "suave"
+  },
+  "pop-naranja": {
+    "nombre": "Pop naranja",
+    "colores": {"fondo": "#FFFFFF", "texto": "#1B1B3A", "acento": "#FF7A00", "apoyo": "#7B2CFF"},
+    "fuentes": {"titulos": "Baloo 2", "pesoTitulos": 800, "texto": "Poppins", "pesoTexto": 600},
+    "movimiento": "energico"
+  },
+  "tecnico": {
+    "nombre": "Técnico",
+    "colores": {"fondo": "#0E141B", "texto": "#EAF1F7", "acento": "#FFC400", "apoyo": "#4FA3FF"},
+    "fuentes": {"titulos": "Space Grotesk", "pesoTitulos": 700, "texto": "IBM Plex Sans", "pesoTexto": 600},
+    "movimiento": "cinematico"
+  },
+  "natural": {
+    "nombre": "Natural",
+    "colores": {"fondo": "#F2F5EE", "texto": "#17301F", "acento": "#2E9E5B", "apoyo": "#F2B134"},
+    "fuentes": {"titulos": "Fraunces", "pesoTitulos": 700, "texto": "Nunito Sans", "pesoTexto": 700},
+    "movimiento": "suave"
+  }
+}

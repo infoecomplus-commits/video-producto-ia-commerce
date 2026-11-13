@@ -1,0 +1,33 @@
+{
+  "tienda": "Nombre de la tienda",
+  "formato": "9:16",
+  "plataforma": "meta",
+  "nivel": 2,
+  "marca": {
+    "estilo": "neon-urbano",
+    "colores": {},
+    "fuentes": {},
+    "movimiento": "energico",
+    "iconos": "emoji"
+  },
+  "logo": {"archivo": "logo.png", "lado": "auto", "opacidad": 0.7},
+  "musica": {"archivo": null, "volumen": 0.12},
+  "voz": {"archivo": null},
+  "sonidos": true,
+  "escenas": [
+    {"tipo": "gancho", "clip": "producto_1.mp4", "desde": 0, "dur": 3,
+     "texto": "Texto del gancho con una *palabra clave*"},
+    {"tipo": "producto", "clip": "producto_2.mp4", "desde": 0, "dur": 3,
+     "texto": "Nombre del *producto*", "subtexto": "Una línea que lo describe"},
+    {"tipo": "demo", "clip": "demo_1.mp4", "desde": 0, "dur": 4,
+     "paso": 1, "texto": "Qué se ve que hace", "icono": "bolt"},
+    {"tipo": "beneficios", "clip": "producto_3.mp4", "desde": 0, "dur": 4,
+     "texto": "Por qué *te va a gustar*",
+     "items": [{"texto": "Beneficio 1", "icono": "check"}, {"texto": "Beneficio 2", "icono": "shield"}, {"texto": "Beneficio 3", "icono": "star"}]},
+    {"tipo": "oferta", "clip": "producto_1.mp4", "desde": 3, "dur": 3,
+     "texto": "Texto de la *oferta* (sin precio)",
+     "items": [{"texto": "Condición 1", "icono": "truck"}]},
+    {"tipo": "cta", "clip": "producto_2.mp4", "desde": 3, "dur": 3.5,
+     "texto": "Llamado a *comprar*", "boton": "Texto del botón", "subtexto": "Dónde y cómo comprar"}
+  ]
+}
