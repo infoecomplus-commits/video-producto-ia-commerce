@@ -72,8 +72,11 @@ python3 scripts/habla.py <proyecto>        # mapa de voz: cada tramo hablado con
 - El método completo, con los errores típicos, está en `references/creadora.md`. Léelo antes de cortar.
 
 ## Paso 3 · El plan de escenas
-Arma el guion con `references/escenas.md`: gancho → producto → demostración → beneficios → oferta → llamado a comprar
-(+ antes/después solo si la categoría y la política lo permiten). Muéstraselo corto, escena por escena, con el clip
+La estructura sale **del material de esta persona**, no de una plantilla. Mira los clips (`media/hoja_*.jpg`) y, si hay
+voz, lo que dicen (`habla.py`), y arma el orden con lo que realmente hay. `references/escenas.md` trae un punto de partida
+(gancho → producto → demostración → beneficios → oferta → llamado a comprar), pero: omite las escenas para las que no hay
+clip o dato confirmado (sin oferta confirmada, no hay escena de oferta), reordénalas según el guion que siguió la persona
+y pregunta qué falta antes de rellenar. Antes/después solo si la categoría y la política lo permiten. Muéstraselo corto, escena por escena, con el clip
 que usarás en cada una, y espera su visto bueno. Ofrécele siempre una **versión corta para historia**.
 Si los clips no tienen voz, el tiempo lo manda el plan; si la tienen, lo mandan las frases elegidas.
 

@@ -4,6 +4,11 @@ Un video de producto es una cadena de escenas; cada una usa un tramo de un clip 
 La duración total es la suma de las escenas (no hay voz que mande el tiempo). Ritmo orientativo: 15 a 30 s para
 anuncio; una versión de historia de 10 a 15 s.
 
+## Punto de partida (se adapta al material)
+Es una base, no una receta: el orden y las escenas salen de los clips y de lo que dice la persona. Si un clip no sirve para
+una escena o un dato no está confirmado, esa escena no se hace. Ejemplo real con una creadora: gancho → problema → producto →
+demostración → cierre (sin beneficios ni oferta, porque ella no los dijo).
+
 ## Flujo recomendado
 | # | Escena | Para qué | Duración |
 |---|---|---|---|
